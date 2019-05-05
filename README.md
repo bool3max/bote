@@ -14,6 +14,7 @@ It implements functionality for editing, removing, moving, organizing, backuping
 * **wkhtmltopdf**
 * **mupdf**
 * **(n)vim** *(with the [Goyo](https://github.com/junegunn/goyo.vim) plugin)*
+* **scdoc** (!only for compiling the manpage!)
 
 ---
 
@@ -27,7 +28,7 @@ It implements functionality for editing, removing, moving, organizing, backuping
 * Notes may be nested (*categorized*) infinitely-deep inside of directories residing recursively inside the **"rootdir"**. Every directory recursively inside of the **"rootdir"** represents a **category**.
 * Every *category* (a directory recursively inside of the **"rootdir"**) ***must*** inside of it contain a directory named ***"pdf"*** which represents a storepoint for any and all notes in the parent category (*directory*), even if the category contains no notes
 * Any note **must** always be associated with an existing ".pdf" file inside of the child **"pdf"** directory and shouldn't exist without one.
-* Any PDF file **must** always be associated with an existing ".md" file inside of the parent category (*directory*).
+* Any PDF file **must** always be associated with an existing ".md" file inside of the parent category (*directory*) and shouldn't exist without one.
 * Should any note be deleted by the user or the script, its associated PDF file must be deleted as well.
 * Storepoints for formats other than PDF are permitted (*but none are currently implemented by the script*)
 

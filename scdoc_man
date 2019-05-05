@@ -1,0 +1,123 @@
+bote(1) ["bote 1.0" ["User Commands"]]
+
+# NAME
+	*bote* - a notetaking and note management utility written in fish
+# SYNOPSIS
+	*bote* [_OPTIONS_...] _OPERATION_ [_ARGUMENTS_...]
+# DESCRIPTION
+	*bote* is a notetaking and note management utility written in the fish shell. It implements functionality for editing, removing, moving, organizing, backuping, and (re)arranging notes.
+
+	By default, `~/notes` is used as the root directory for any and all notes.
+	By default, the logfile is located at `~/.botelog`.
+	By default, the stylesheet to be used when one isn't provded with *--stylesheet, -S* is `~/.md_css/tufte/tufte.css`.
+# OPERATIONS
+	*bote* supports many different operations. Some require no additional arguments, while some require a fixed or variable amount of additional arguments.
+
+	*create-category, C*++
+	bote create-category _CC_
+
+	Create a new category using the supplied category chain.
+
+	*remove-category, D*++
+	bote remove-category _CC_
+
+	Remove the category specified in the category chain.
+
+	*move-category, M*++
+	bote move-category _CC_ _CC_
+
+	Move a category from one category chain to another.
+
+	*create, c*++
+	bote create [_CC_] _note\_name_
+
+	Create a note in the specified category chain or in the root category if one is not given.
+
+	*remove, d*++
+	bote remove [_CC_] _note\_name_
+
+	Remove a note in the specified category chain or in the root category if one is not given.
+
+	*move, m*++
+	bote move [_CC_] _note\_name_ _CC_
+
+	Move a note from the specified category chain (or from the root category if one is not given) to another.
+
+	*sanitize, s*++
+	bote sanitize
+
+	Sanitize the entire folder structure (make sure that every category chain has a 'pdf' directory inside of it)
+
+	*list, l*++
+	bote list
+
+	List the entire note tree.
+
+	*backup, b*++
+	bote backup [_-z_] _PATH_
+
+	Backup the entire note tree to the TAR archive specified by _PATH_.
+
+	*restore, r*++
+	bote restore [_-z_] _PATH_
+
+	Restore the note tree from the backup TAR archive specified by _PATH_ to the current root directory. Notes that already exist in the "local" root tree are replaced only if they are older than their backup counterparts.
+
+	*edit, e*++
+	bote edit [_CC_] [_note\_name_]
+
+	Start editing a note in the specified category chain. The note's markdown file is opened inside of *neovim*, and the associated PDF file is opened inside of "mupdf". Once *neovim* is closed, the associated *mupdf* process is terminated as well. On save, the markdown file's PDF counterpart is updated using *pandoc, wkhtmltopdf* and the specified CSS stylesheet, and the PDF view is updated.
+# CATEGORY CHAINS (CC)
+	A *category chain* simply represents a "chain" of categories nested inside one another. Categories are separated using a slash (/).
+
+	e.g. the category chain *linux/drives/booting* could be read as: category *booting* is a category that resides inside of the category *drives* that resides inside of the category *linux*, that resides in the root category
+# OPTIONS
+	*--help, -h*++
+    	Display help and exit.
+
+	*--root-directory* _PATH_, *-r* _PATH_++
+    	Use an alternative *rootdir* for the following operation.
+
+	*--stylesheet* _PATH_, *-S* _PATH_++
+    	Use an alternative CSS stylesheet for the following operation.
+
+	*--logfile* _PATH_, *-L* _PATH_++
+		Use an alternative path for the logging file.
+
+	*--gzip, -z*++
+    	Specfiy that the TAR archive provided for the backup/restore operation is also gzipped.
+# ENVIRONMENT VARIABLES
+	Some of the environment variables that *bote* uses.
+
+	- *BOTE_ROOTDIR*: override the default root directory
+	- *BOTE_DEFAULTCSS*: override the default stylesheet
+	- *BOTE_LOGFILE*: override the path of the logfile
+# EXAMPLES
+	bote c linux/testing stuff++
+	Create a note named "stuff" in the category chain "linux/testing".
+
+	bote d linux/testing stuff++
+	Remove the note named "stuff" inside of the category chain "linux/testing.
+
+	bote c stuff++
+	Create a note named "stuff" in the root category.
+
+	bote D linux/testing++
+	Remove the category "testing" located in the "linux" category.
+
+	bote b -z ~/noteback.tar.gz++
+	Create a full, gzipped TAR backup of the root directory and store it at `~/noteback.tar.gz`
+
+	bote r -z ~/noteback.tar.gz++
+	Restore all the notes from the gzipped TAR backup located at `~/noteback.tar.gz`.
+
+	bote e amazing++
+	Begin editing a note called "amazing" located in the root category.
+
+	bote m linux/stuff keep linux++
+	Move the note called "keep" from the category chain "linux/stuff" to the category "linux". (like moving a file to the parent directory)
+
+	bote M linux/stuff systems++
+	Move the category "stuff" that is located in the "linux" category to the "systems" category. ("linux" and "systems" categoies are in the root category)
+# EXIT STATUS
+	*bote* should exit with exit status *0* if no errors occured, and with *1* otherwise.

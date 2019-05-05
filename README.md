@@ -1,2 +1,3 @@
 # bote
-A Markdown/PDF notetaking utility written in fish
+
+***bote*** is a notetaking and note management utility writte in the [**fish shell**](https://fishshell.com/).

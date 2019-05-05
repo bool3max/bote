@@ -35,7 +35,7 @@ For a comprehensive description of the utility and all of its functionality, see
 
 ## TODO
 
-* Write the manpage and include usage examples
-* Implement remote backup and restore functionality via Google Drive
-* Implement the option for overriding the editor as well as the PDF reader
-* --Implement local backup and restore functionality--
+* ❌ Write the manpage and include usage examples
+* ❌ Implement remote backup and restore functionality via Google Drive
+* ❌ Implement the option for overriding the editor as well as the PDF reader
+* ✔️ ~~Implement local backup and restore functionality~~

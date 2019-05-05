@@ -2,6 +2,8 @@
 
 It implements functionality for editing, removing, moving, organizing, backuping up, and (re)arranging notes. 
 
+![screenshot1](./screenshots/1.png)
+
 --- 
 
 ## Dependencies
@@ -46,4 +48,5 @@ For a comprehensive description of the utility and all of its functionality, see
 * ❌ Write the manpage and include usage examples
 * ❌ Implement remote backup and restore functionality via Google Drive
 * ❌ Implement the option for overriding the editor as well as the PDF reader (thus removing 2 potentially unnecessary dependencies)
+* ✔️  ~~Implement interactive Tab completions~~
 * ✔️ ~~Implement local backup and restore functionality~~

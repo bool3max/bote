@@ -58,8 +58,8 @@ To compile and install the manpage:
 
 ## TODO
 
-* ❌ Write the manpage and include usage examples
 * ❌ Implement remote backup and restore functionality via Google Drive
 * ❌ Implement the option for overriding the editor as well as the PDF reader (thus removing 2 potentially unnecessary dependencies)
 * ✔️  ~~Implement interactive Tab completions~~
-* ✔️ ~~Implement local backup and restore functionality~~
+* ✔️  ~~Create a manpage with included usage examples~~
+* ✔️  ~~Implement local backup and restore functionality~~

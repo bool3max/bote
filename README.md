@@ -43,11 +43,18 @@ For a comprehensive description of the utility and all of its functionality, see
 
 ---
 
+### Completions
+
 **bote** comes with `Tab` interactive completions for fish. It's able to complete note/category names as well as all of the flags and their respective options.
 
-1. Clone the repository
-2. Run `$ cp completions/bote.fish ~/.config/fish/completions` to install the completions
-3. Reload fish
+1. Run `$ cp completions/bote.fish ~/.config/fish/completions` to install the completions
+2. Reload fish
+
+### Manpage
+
+To compile and install the manpage:
+
+1. Run `$ scdoc < ./scdoc_man > /usr/local/man/man8/bote.1 && gzip /usr/local/man/man8/bote.1`
 
 ## TODO
 

@@ -33,6 +33,14 @@ It implements functionality for editing, removing, moving, organizing, backuping
 
 For a comprehensive description of the utility and all of its functionality, see the manpage (**bote(1)**).
 
+## Installing the completions
+
+**bote** comes with `Tab` interactive completions for fish. It's able to complete note/category names as well as all of the flags and their respective options.
+
+1. Clone the repository
+2. Run `$ cp completions/bote.fish ~/.config/fish/completions` to install the completions
+3. Reload fish
+
 ## TODO
 
 * ❌ Write the manpage and include usage examples

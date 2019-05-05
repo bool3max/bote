@@ -1,4 +1,4 @@
-***bote*** is a notetaking and note management utility writte in the [**fish shell**](https://fishshell.com/).
+***bote*** is a notetaking and note management utility written in the [**fish shell**](https://fishshell.com/).
 
 --- 
 
@@ -9,4 +9,20 @@
 * **pandoc**
 * **wkhtmltopdf**
 * **mupdf**
-* **(n)vim** *(with the [Goyo](https://github.com/junegunn/goyo.vim) plugin*
+* **(n)vim** *(with the [Goyo](https://github.com/junegunn/goyo.vim) plugin)*
+
+---
+
+## The note storage system and its guidelines
+
+* All of the notes are stored in a base "root" directory on the filesystem, hereinafter reffered to as the **"rootdir"**.
+* All of the notes: 
+    + are represented as regular files on the filesystem
+    + are written in standard Markdown
+    + always use the ***.md*** file extensions
+* Notes may be nested (*categorized*) infinitely-deep inside of directories residing recursively inside the **"rootdir"**. Every directory recursively inside of the **"rootdir"** represents a **category**.
+* Every *category* (a directory recursively inside of the **"rootdir"**) ***must*** inside of it contain a directory named ***"pdf"*** which represents a storepoint for any and all notes in the parent category (*directory*), even if the category contains no notes
+* Any note **must** always be associated with an existing ".pdf" file inside of the child **"pdf"** directory and shouldn't exist without one.
+* Any PDF file **must** always be associated with an existing ".md" file inside of the parent category (*directory*).
+* Should any note be deleted by the user or the script, its associated PDF file must be deleted as well.
+* Storepoints for formats other than PDF are permitted (*but none are currently implemented by the script*)

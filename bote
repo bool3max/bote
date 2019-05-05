@@ -1,0 +1,236 @@
+#!/usr/bin/fish
+
+# ---
+# explanation and guidelines of my current note management system:
+    # the base directory for any and all notes on my current system is $HOME/notes, hereinafter reffered to as the "root directory"
+    # notes may exist directly in the root directory, but they may further be recursivery categorized and organized into other directories, infinitely deep
+    # all my notes are written in standard markdown, WITH A .md extension
+    # any diretory recursively inside of the root directory MUST also have a "pdf" directory which includes PDF versions of all notes in the parent directory
+        # the "pdf" directory may not contain PDFs of .md files that do not exist in the parent directory (e.g. an .md note was created, converted to a pdf, the .md was since deleted, but the PDF remained -- this should not happen)
+        # notes are converted to PDF using pandoc and the wkhtmltopdf engine using a configurable CSS stylesheet
+        # directories for formats other PDF (e.g. docx, other proprietary formats) are permitted but optional -- same rules apply
+# ---
+# DEPENDENCIES: fish, gnucoreutils, pandoc, wkhtmltopdf, mupdf, (n)vim with the Goyo plugin
+
+status job-control full # not sure if needed
+
+# defaults can be overriden with env. vars 
+set -q BOTE_ROOTDIR && set rootdir $BOTE_ROOTDIR || set rootdir "$HOME/notes"
+set -q BOTE_DEFAULTCSS && set default_stylesheet $BOTE_DEFAULTCSS || set default_stylesheet "$HOME/.md_css/tufte/tufte.css"
+set -q BOTE_LOGFILE && set logfile $BOTE_LOGFILE || set logfile "$HOME/.botelog"
+
+set progname "bote"
+set usagestring "\e[1m$progname: Incorrect usage. See $progname(1) for details.\e[0m"
+set helpstring "\e[1mSee $progname(1) for details.\e[0m"
+set opts 'h/help' 'r/root-directory=' 'S/stylesheet=' 'L/logfile=' 'z/gzip'
+
+argparse -n $progname $opts -- $argv || begin; echo -e $usagestring && exit 1; end 
+set -q _flag_h && echo -e $helpstring && exit 0 # quit after showing the help string
+
+# defaults can also be overriden with opts (opts -> env. vars -> defaults)
+set -q _flag_r && set rootdir $_flag_r
+set -q _flag_S && set default_stylesheet $_flag_S
+set -q _flag_L && set logfile $_flag_L
+
+# function definitions
+
+function minargs -a min -V argv
+    # call this to ensure that the script is called with the appropriate number of arguments AFTER the flags have already been parsed and removed from the
+    # main $argv. The reason I'm not using `argprase`'s -N is because it's not the same for each operation that the user can execute
+    test (count $argv) -lt $min && echo -e $usagestring && exit 1
+end
+
+function create_category
+    # create and properly sanitize the specified category chain
+    # argv[1] - the category chain to create
+
+    # find the first non-existent category in the chain
+
+    set first $rootdir
+    for subcateg in (string split '/' $argv[1])
+        set first "$first/$subcateg"
+        not test -d $first && break
+    end
+
+    mkdir -p "$rootdir/$argv[1]"
+    create_pdf_dirs $first
+end
+
+function remove_category
+    # recursively remove the specified category chain (deletes all subcategories, notes, and pdfs)
+    # argv[1] - the category chain to recursively remove
+    
+    test -d "$rootdir/$argv[1]" || return 1
+    rm -rf "$rootdir/$argv[1]"
+end
+
+function move_category
+    # move one category into another
+    # argv[1,2] - the category chains
+
+    not test -d "$rootdir/$argv[1]" && return 1
+    not test -d "$rootdir/$argv[2]" && create_category $argv[2]
+
+    mv "$rootdir/$argv[1]" "$rootdir/$argv[2]"
+end
+
+function create_pdf_dirs
+    # recursively make sure that every folder inside the specified folder has a "pdf" folder inside of it
+    # argv[1] - the top folder to begin the sanitization at
+
+    test -d $argv[1] || return 1
+    test -d "$argv[1]/pdf" || mkdir -p "$argv[1]/pdf" # since the ** loop doesn't care the base starting directory
+
+    for ent in $argv[1]/**
+        test -d $ent || continue # only test for folders
+        test (basename $ent) = 'pdf' && continue # don't test the actual pdf folders
+        test -d "$ent/pdf" || mkdir -p "$ent/pdf" # create a 'pdf' folder in the case it doesn't exist
+    end
+end
+
+function create_note
+    # create the note's markdown file and pdf counterpart in the specified category chain. In the case that the category chain doesn't exist, it will be created
+    # and properly sanitized
+    # argv[1] - the category chain to create the note in
+    # argv[2] - the note name
+    # argv[3] - the per-operation stylesheet (optional)
+
+    not test -d "$rootdir/$argv[1]" && create_category $argv[1] # create the category chain if it doesn't already exist
+    test -d $rootdir/$argv[2] && return 2 # quit if a category in the root dir with the same name already exists
+    touch "$rootdir/$argv[1]/$argv[2].md"
+    md2pdf $argv[1] $argv[2] $argv[3]
+end
+
+function md2pdf
+    # create the corresponding PDF of a specified note and save it in the corresponding 'pdf' folder
+    # argv[1] - the category chain
+    # argv[2] - the note name
+    # argv[3] - the per-operation stylesheet to use (optional)
+    not test -f "$rootdir/$argv[1]/$argv[2].md" && return 1 # quit if the note doesn't exist
+    pandoc -f markdown -t html5 "$rootdir/$argv[1]/$argv[2].md" --pdf-engine wkhtmltopdf --css (set -q argv[3] && echo -n $argv[3] || echo -n $default_stylesheet) -o "$rootdir/$argv[1]/pdf/$argv[2].pdf" 1>>$logfile 2>>&1
+end
+
+function remove_note
+    # remove the specified note and its corresponding pdf file
+    # argv[1] - the category chain
+    # argv[2] - the note name
+
+    not test -f "$rootdir/$argv[1]/$argv[2].md" && return 1
+    rm -f "$rootdir/$argv[1]/$argv[2].md" "$rootdir/$argv[1]/pdf/$argv[2].pdf" # remove both
+end
+
+function move_note
+    # move the specified note and its corresponding PDF counterpart from one category chain to the other
+    # argv[1] - the category chain
+    # argv[2] - the note name
+    # argv[3] - the category chain to move the note to
+
+    not test -f "$rootdir/$argv[1]/$argv[2].md" && return 1 # quit if the note doesn't exist
+    not test -d "$rootdir/$argv[3]" && create_category $argv[3] # create the category-to-move-to if it doesn't already exist
+    # move both the note and the pdf
+    mv "$rootdir/$argv[1]/$argv[2].md" "$rootdir/$argv[3]"
+    mv "$rootdir/$argv[1]/pdf/$argv[2].pdf" "$rootdir/$argv[3]/pdf"
+end
+
+function treelist 
+    # a simple routine which takes two arguments
+    # argv[1] - a path to a certain category folder (must be an actual filepath and not a category chain)
+    # argv[2] - the number of spaces to be used for indentation (this will get increased by 2 each time this function is recursively executed and should start at 0)
+
+    # list all markdown notes without the extension in the specified directory using the specified indentation 
+    for note in $argv[1]/*.md
+        echo -e "\e[93m\e[3m$argv[2]"(basename $note .md)"\e[0m"
+    end
+
+    # recursively do the same for categories
+    for categ in $argv[1]/*
+        not test -d $categ && continue # skip files
+        test (basename $categ) = 'pdf' && continue
+
+        echo -e "\e[36m\e[1m$argv[2]"(basename $categ)"/\e[0m"
+        treelist $categ "$argv[2]  "
+    end
+end
+
+function localbackup -V _flag_gzip -V _flag_z
+    # a function which backups the entire rootdir folder in the form of a (gzipped) tar archive
+    # if the tar archive is to be gzip compressed, the user can supply the --gzip/-z flag
+    # argv[1] - the full path (incl. the filename) of the backup file
+    tar -c (set -q _flag_gzip && echo -n '-z') -f $argv[1] -C $rootdir .
+end
+
+function localrestore -V _flag_gzip -V _flag_z
+    # a function which, when given a local backup generated using "localbackup" restores the backup to the current rootdir
+    # if a note inside the backup already exists locally, the local copy is replaced ONLY if it is older than the backup version
+    # argv[1] - the full path to the existing backup file
+    tar -x (set -q _flag_gzip && echo -n '-z') -f $argv[1] -C $rootdir . --keep-newer-files
+end
+
+# runtime starts here
+
+not test -d $rootdir/pdf && mkdir -p $rootdir/pdf # create the root directory if it doesn't exist
+
+minargs 1 # immediately quit if less than 1 argument was provided (that usually being the 'operation to perform')
+
+switch $argv[1] # the operation to perform
+    case create-category C
+        minargs 2
+        create_category $argv[2]
+    case remove-category D
+        minargs 2
+        remove_category $argv[2]
+    case move-category M
+        minargs 3
+        move_category $argv[2] $argv[3]
+    case create c
+        minargs 2
+        test (count $argv) -ge 3 && create_note $argv[2] $argv[3] $_flag_css || create_note '/' $argv[2] $_flag_css
+        test $status = 2 && echo -e "\e[1mA category of the same name already exists!\e[0m" ; exit 1
+    case remove d
+        minargs 2
+        test (count $argv) -ge 3 && remove_note $argv[2] $argv[3] || remove_note '/' $argv[2]
+    case move m
+        minargs 3
+        test (count $argv) -ge 4 && move_note $argv[2] $argv[3] $argv[4] || move_note '/' $argv[2] $argv[3]
+    case sanitize s
+        # no minargs since it takes no arguments
+        create_pdf_dirs $rootdir
+    case list l
+        # no minargs since it takes no arguments
+        if test (count $argv) -ge 2
+            echo -e "\e[1mNotes (\e[36m$argv[2]\e[37m):\n\e[0m"
+            treelist "$rootdir/$argv[2]" ''
+        else
+            echo -e "\e[1mNotes:\n\e[0m"   
+            treelist $rootdir ''
+        end
+    case backup b
+        localbackup $argv[2]
+    case restore r
+        localrestore $argv[2]
+    case edit e 
+        minargs 2
+
+        # establish paths to both the .md and the .pdf file
+        if test (count $argv) -ge 3
+            set mdpath "$rootdir/$argv[2]/$argv[3].md" 
+            set pdfpath "$rootdir/$argv[2]/pdf/$argv[3].pdf"
+        else
+            set mdpath "$rootdir/$argv[2].md"
+            set pdfpath "$rootdir/pdf/$argv[2].pdf"
+        end
+
+        # create the note if it doesn't already exist
+        if not test -f $mdpath
+            test (count $argv) -ge 3 && create_note $argv[2] $argv[3] $_flag_css || create_note '/' $argv[2] $_flag_css
+        end
+        # at this point both the mdpath and pdfpath files are guaranteed to exist
+        mupdf $pdfpath &
+        set pid_mupdf (jobs -lp)
+        # live-rebuilt mechanism for the PDF  
+        fish -c "while inotifywait -qq $mdpath 2>>$logfile 1>>&2; pandoc -f markdown -t html5 $mdpath --css $default_stylesheet --pdf-engine wkhtmltopdf -o $pdfpath 1>>$logfile 2>>&1 && kill -1 $pid_mupdf; end" &
+        set pid_sub (jobs -lp)
+        nvim $mdpath -c "Goyo"; kill -15 $pid_mupdf $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
+    case '*'
+        echo -e $usagestring ; exit 1
+end

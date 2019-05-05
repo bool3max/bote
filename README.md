@@ -35,7 +35,12 @@ It implements functionality for editing, removing, moving, organizing, backuping
 
 For a comprehensive description of the utility and all of its functionality, see the manpage (**bote(1)**).
 
-## Installing the completions
+## Installation
+
+1. Clone the repository
+2. Copy the main executable to a location inside your `$PATH`, e.g. `$ cp ./bote /usr/local/bin`
+
+---
 
 **bote** comes with `Tab` interactive completions for fish. It's able to complete note/category names as well as all of the flags and their respective options.
 

@@ -1,5 +1,7 @@
 ***bote*** is a notetaking and note management utility written in the [**fish shell**](https://fishshell.com/).
 
+It implements functionality for editing, removing, moving, organizing, backuping up, and (re)arranging notes. 
+
 --- 
 
 ## Dependencies
@@ -26,3 +28,14 @@
 * Any PDF file **must** always be associated with an existing ".md" file inside of the parent category (*directory*).
 * Should any note be deleted by the user or the script, its associated PDF file must be deleted as well.
 * Storepoints for formats other than PDF are permitted (*but none are currently implemented by the script*)
+
+## Usage
+
+For a comprehensive description of the utility and all of its functionality, see the manpage (**bote(1)**).
+
+## TODO
+
+* Write the manpage and include usage examples
+* Implement remote backup and restore functionality via Google Drive
+* Implement the option for overriding the editor as well as the PDF reader
+* --Implement local backup and restore functionality--

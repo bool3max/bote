@@ -231,6 +231,13 @@ switch $argv[1] # the operation to perform
         fish -c "while inotifywait -qq $mdpath 2>>$logfile 1>>&2; pandoc -f markdown -t html5 $mdpath --css $default_stylesheet --pdf-engine wkhtmltopdf -o $pdfpath 1>>$logfile 2>>&1 && kill -1 $pid_mupdf; end" &
         set pid_sub (jobs -lp)
         nvim $mdpath -c "Goyo"; kill -15 $pid_mupdf $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
+    case view v
+        minargs 2
+        if test (count $argv) -ge 3
+            mupdf "$rootdir/$argv[2]/pdf/$argv[3].pdf" &
+        else
+            mupdf "$rootdir/pdf/$argv[2].pdf" &
+        end
     case '*'
         echo -e $usagestring ; exit 1
 end

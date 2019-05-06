@@ -67,6 +67,11 @@ bote(1) ["bote 1.0" ["User Commands"]]
 	bote edit [_CC_] [_note\_name_]
 
 	Start editing a note in the specified category chain. The note's markdown file is opened inside of *neovim*, and the associated PDF file is opened inside of "mupdf". Once *neovim* is closed, the associated *mupdf* process is terminated as well. On save, the markdown file's PDF counterpart is updated using *pandoc, wkhtmltopdf* and the specified CSS stylesheet, and the PDF view is updated.
+
+	*view, v*++
+	bote view [_CC] [_note\_name_]
+
+	View the note's PDF file.
 # CATEGORY CHAINS (CC)
 	A *category chain* simply represents a "chain" of categories nested inside one another. Categories are separated using a slash (/).
 

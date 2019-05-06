@@ -1,8 +1,8 @@
 # a fish shell completion file for the bote script
 
 set progname 'bote'
-set mainops_long 'create-category' 'remove-category' 'move-category' 'create' 'remove' 'move' 'sanitize' 'list' 'backup' 'restore' 'edit'
-set mainops_short 'C' 'D' 'M' 'c' 'd' 'm' 's' 'l' 'b' 'r' 'e'
+set mainops_long 'create-category' 'remove-category' 'move-category' 'create' 'remove' 'move' 'sanitize' 'list' 'backup' 'restore' 'edit' 'view'
+set mainops_short 'C' 'D' 'M' 'c' 'd' 'm' 's' 'l' 'b' 'r' 'e' 'v'
 set mainops_all $mainops_long $mainops_short
 set opts 'h/help' 'r/root-directory=' 'S/stylesheet=' 'L/logfile=' 'z/gzip' # mirrored from the main script
 
@@ -76,6 +76,15 @@ function note_completion -d 'Provide argument completions for actual category ch
         case restore r
             # args are just files so no meaningful custom completions necessary
         case edit e
+            if test (count $argv) = 1 # i.e. only the mainop has been supplied
+                # provide category chains AND notes in the rootdir
+                categ_chains '/'
+                note_names '/'
+            else 
+                # there's more than one argument, determine whether it's a notename (rootdir), OR a category chain
+                test (count $argv) -lt 3 && is_valid_chain $argv[2] && note_names $argv[2]
+            end
+        case view v
             if test (count $argv) = 1 # i.e. only the mainop has been supplied
                 # provide category chains AND notes in the rootdir
                 categ_chains '/'

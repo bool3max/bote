@@ -225,18 +225,18 @@ switch $argv[1] # the operation to perform
             test (count $argv) -ge 3 && create_note $argv[2] $argv[3] $_flag_css || create_note '/' $argv[2] $_flag_css
         end
         # at this point both the mdpath and pdfpath files are guaranteed to exist
-        mupdf $pdfpath &
-        set pid_mupdf (jobs -lp)
+        zathura $pdfpath &
+        set pid_zathura (jobs -lp)
         # live-rebuilt mechanism for the PDF  
-        fish -c "while inotifywait -qq $mdpath 2>>$logfile 1>>&2; pandoc -f markdown -t html5 $mdpath --css $default_stylesheet --pdf-engine wkhtmltopdf -o $pdfpath 1>>$logfile 2>>&1 && kill -1 $pid_mupdf; end" &
+        fish -c "while inotifywait -qq $mdpath 2>>$logfile 1>>&2; pandoc -f markdown -t html5 $mdpath --css $default_stylesheet --pdf-engine wkhtmltopdf -o $pdfpath 1>>$logfile 2>>&1; end" &
         set pid_sub (jobs -lp)
-        nvim $mdpath -c "Goyo"; kill -15 $pid_mupdf $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
+        nvim $mdpath -c "Goyo"; kill -15 $pid_zathura $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
     case view v
         minargs 2
         if test (count $argv) -ge 3
-            mupdf "$rootdir/$argv[2]/pdf/$argv[3].pdf" &
+            zathura "$rootdir/$argv[2]/pdf/$argv[3].pdf" &
         else
-            mupdf "$rootdir/pdf/$argv[2].pdf" &
+            zathura "$rootdir/pdf/$argv[2].pdf" &
         end
     case '*'
         echo -e $usagestring ; exit 1

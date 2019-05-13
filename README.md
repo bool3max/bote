@@ -41,7 +41,7 @@ For a comprehensive description of the utility and all of its functionality, see
 
 You'll probably also want to set the environment variables `BOTE_EDITOR_CMDLINE` and `BOTE_PDF_CMDLINE` to set your default text editor and PDF viewer.
 
-**NOTE**: Due to the current limitations of the fish shell, the environment variables `BOTE_PDF_CMDLINE` and `BOTE_EDITOR_CMDNLINE` may *not* contain spaces inside of individual arguments.
+**NOTE**: Due to the current limitations of the fish shell, the environment variables `BOTE_PDF_CMDLINE` and `BOTE_EDITOR_CMDLINE` may *not* contain spaces inside of individual arguments.
 
 ---
 
@@ -61,7 +61,7 @@ To compile and install the manpage:
 ## TODO
 
 * ❌ Implement remote backup and restore functionality via Google Drive
-* ❌ Implement the option for overriding the editor as well as the PDF reader (thus removing 2 potentially unnecessary dependencies)
+* ✔️  ~~Implement the option for overriding the editor as well as the PDF reader (thus removing 2 potentially unnecessary dependencies)~~
 * ✔️  ~~Implement interactive Tab completions~~
 * ✔️  ~~Create a manpage with included usage examples~~
 * ✔️  ~~Implement local backup and restore functionality~~

@@ -18,6 +18,8 @@ status job-control full # not sure if needed
 set -q BOTE_ROOTDIR && set rootdir $BOTE_ROOTDIR || set rootdir "$HOME/notes"
 set -q BOTE_DEFAULTCSS && set default_stylesheet $BOTE_DEFAULTCSS || set default_stylesheet "$HOME/.md_css/tufte/tufte.css"
 set -q BOTE_LOGFILE && set logfile $BOTE_LOGFILE || set logfile "$HOME/.botelog"
+set -q BOTE_EDITOR_CMDLINE && set editor_cmdline $BOTE_EDITOR_CMDLINE || set editor_cmdline 'vim %f'
+set -q BOTE_PDF_CMDLINE && set pdf_cmdline $BOTE_PDF_CMDLINE || set pdf_cmdline 'zathura %f'
 
 set progname "bote"
 set usagestring "\e[1m$progname: Incorrect usage. See $progname(1) for details.\e[0m"
@@ -169,7 +171,6 @@ end
 # runtime starts here
 
 not test -d $rootdir/pdf && mkdir -p $rootdir/pdf # create the root directory if it doesn't exist
-
 minargs 1 # immediately quit if less than 1 argument was provided (that usually being the 'operation to perform')
 
 switch $argv[1] # the operation to perform
@@ -224,20 +225,31 @@ switch $argv[1] # the operation to perform
         if not test -f $mdpath
             test (count $argv) -ge 3 && create_note $argv[2] $argv[3] $_flag_css || create_note '/' $argv[2] $_flag_css
         end
+
         # at this point both the mdpath and pdfpath files are guaranteed to exist
-        zathura $pdfpath &
-        set pid_zathura (jobs -lp)
+        # tidy the editor_cmdline and pdf_cmdline to include proper filenames by replacing the %f with a full path
+        set editor_cmdline (string replace -i '%f' $mdpath $editor_cmdline)
+        set pdf_cmdline (string replace -i '%f' $pdfpath $pdf_cmdline)
+        set editor_cmdline (string split ' ' $editor_cmdline)
+        set pdf_cmdline (string split ' ' $pdf_cmdline)
+
+        $pdf_cmdline &
+        set pid_pdf (jobs -lp)
         # live-rebuilt mechanism for the PDF  
         fish -c "while inotifywait -qq $mdpath 2>>$logfile 1>>&2; pandoc -f markdown -t html5 $mdpath --css $default_stylesheet --pdf-engine wkhtmltopdf -o $pdfpath 1>>$logfile 2>>&1; end" &
         set pid_sub (jobs -lp)
-        nvim $mdpath -c "Goyo"; kill -15 $pid_zathura $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
+        $editor_cmdline; kill -15 $pid_pdf $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
     case view v
         minargs 2
         if test (count $argv) -ge 3
-            zathura "$rootdir/$argv[2]/pdf/$argv[3].pdf" &
+            set pdfpath "$rootdir/$argv[2]/pdf/$argv[3].pdf" 
         else
-            zathura "$rootdir/pdf/$argv[2].pdf" &
+            set pdfpath "$rootdir/pdf/$argv[2].pdf" 
         end
+
+        set pdf_cmdline (string replace -i '%f' $pdfpath $pdf_cmdline)
+        set pdf_cmdline (string split ' ' $pdf_cmdline)
+        $pdf_cmdline
     case '*'
         echo -e $usagestring ; exit 1
 end

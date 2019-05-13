@@ -12,8 +12,6 @@ It implements functionality for editing, removing, moving, organizing, backuping
 * **gnucoreutils**
 * **pandoc**
 * **wkhtmltopdf**
-* **mupdf**
-* **(n)vim** *(with the [Goyo](https://github.com/junegunn/goyo.vim) plugin)*
 * **scdoc** (!only for compiling the manpage!)
 
 ---
@@ -40,6 +38,10 @@ For a comprehensive description of the utility and all of its functionality, see
 
 1. Clone the repository
 2. Copy the main executable to a location inside your `$PATH`, e.g. `$ cp ./bote /usr/local/bin`
+
+You'll probably also want to set the environment variables `BOTE_EDITOR_CMDLINE` and `BOTE_PDF_CMDLINE` to set your default text editor and PDF viewer.
+
+NOTE: Due to the current limitations of the fish shell, the environment variables `BOTE_PDF_CMDLINE` and `BOTE_EDITOR_CMDNLINE` may *not* contain spaces inside of individual arguments.
 
 ---
 

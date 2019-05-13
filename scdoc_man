@@ -97,6 +97,12 @@ bote(1) ["bote 1.0" ["User Commands"]]
 	- *BOTE_ROOTDIR*: override the default root directory
 	- *BOTE_DEFAULTCSS*: override the default stylesheet
 	- *BOTE_LOGFILE*: override the path of the logfile
+	- *BOTE_EDITOR_CMDLINE*: a string which represents the commandline the shell will execute to start a text editor for editing markdown files, in which %f should serve as a placeholder for the filename (e.g. "nvim -c Goyo %f", "nano %f")++
+	The value "vim %f" is used internally if the env. var is not set
+	- *BOTE_PDF_CMDLINE*: a string which represents the commandline the shell will execute to start a PDF reader for viewing PDF files, in which %f should serve as a placeholder for the PDF filename (e.g. "zathura %f", "mupdf %f")++
+	The value "zathura %f" is used internally if the env. var is not set
+
+	NOTE: Due to the current limitations of the fish shell, the environment variables *BOTE_PDF_CMDLINE* and *BOTE_EDITOR_CMDNLINE* may *not* contain spaces inside of individual arguments. 
 # EXAMPLES
 	bote c linux/testing stuff++
 	Create a note named "stuff" in the category chain "linux/testing".

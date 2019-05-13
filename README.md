@@ -41,7 +41,7 @@ For a comprehensive description of the utility and all of its functionality, see
 
 You'll probably also want to set the environment variables `BOTE_EDITOR_CMDLINE` and `BOTE_PDF_CMDLINE` to set your default text editor and PDF viewer.
 
-NOTE: Due to the current limitations of the fish shell, the environment variables `BOTE_PDF_CMDLINE` and `BOTE_EDITOR_CMDNLINE` may *not* contain spaces inside of individual arguments.
+**NOTE**: Due to the current limitations of the fish shell, the environment variables `BOTE_PDF_CMDLINE` and `BOTE_EDITOR_CMDNLINE` may *not* contain spaces inside of individual arguments.
 
 ---
 

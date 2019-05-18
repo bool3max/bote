@@ -18,7 +18,7 @@ It implements functionality for editing, removing, moving, organizing, backuping
 
 ## The note storage system and its guidelines
 
-* All of the notes are stored in a base "root" directory on the filesystem, hereinafter reffered to as the **"rootdir"**.
+* All of the notes are stored in a base "root" directory on the filesystem, hereinafter reffered to as the **"rootdir"**. By default it is `$HOME/notes`.
 * All of the notes: 
     + are represented as regular files on the filesystem
     + are written in standard Markdown

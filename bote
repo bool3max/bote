@@ -10,7 +10,7 @@
         # notes are converted to PDF using pandoc and the wkhtmltopdf engine using a configurable CSS stylesheet
         # directories for formats other PDF (e.g. docx, other proprietary formats) are permitted but optional -- same rules apply
 # ---
-# DEPENDENCIES: fish, gnucoreutils, pandoc, wkhtmltopdf, mupdf, (n)vim with the Goyo plugin
+# DEPENDENCIES: fish, gnucoreutils, pandoc, wkhtmltopdf
 
 status job-control full # not sure if needed
 

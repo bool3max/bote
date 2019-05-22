@@ -14,11 +14,18 @@
 
 status job-control full # not sure if needed
 
-# defaults can be overriden with env. vars 
+# env var configuration and their defaults
 set -q BOTE_ROOTDIR && set rootdir $BOTE_ROOTDIR || set rootdir "$HOME/notes"
 set -q BOTE_DEFAULTCSS && set default_stylesheet $BOTE_DEFAULTCSS || set default_stylesheet "$HOME/.md_css/tufte/tufte.css"
 set -q BOTE_LOGFILE && set logfile $BOTE_LOGFILE || set logfile "$HOME/.botelog"
 set -q BOTE_EDITOR_CMDLINE && set editor_cmdline $BOTE_EDITOR_CMDLINE || set editor_cmdline 'vim %f'
+if set -q BOTE_EDITOR_CMDLINE
+    set -g editor_cmdline $BOTE_EDITOR_CMDLINE
+else if set -q EDITOR
+    set -g editor_cmdline "$EDITOR %f"
+else
+    set -g editor_cmdline "vim %f"
+end
 set -q BOTE_PDF_CMDLINE && set pdf_cmdline $BOTE_PDF_CMDLINE || set pdf_cmdline 'zathura %f'
 
 set progname "bote"

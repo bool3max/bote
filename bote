@@ -18,7 +18,6 @@ status job-control full # not sure if needed
 set -q BOTE_ROOTDIR && set rootdir $BOTE_ROOTDIR || set rootdir "$HOME/notes"
 set -q BOTE_DEFAULTCSS && set default_stylesheet $BOTE_DEFAULTCSS || set default_stylesheet "$HOME/.md_css/tufte/tufte.css"
 set -q BOTE_LOGFILE && set logfile $BOTE_LOGFILE || set logfile "$HOME/.botelog"
-set -q BOTE_EDITOR_CMDLINE && set editor_cmdline $BOTE_EDITOR_CMDLINE || set editor_cmdline 'vim %f'
 if set -q BOTE_EDITOR_CMDLINE
     set -g editor_cmdline $BOTE_EDITOR_CMDLINE
 else if set -q EDITOR

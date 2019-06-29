@@ -255,7 +255,7 @@ switch $argv[1] # the operation to perform
 
         set pdf_cmdline (string replace -i '%f' $pdfpath $pdf_cmdline)
         set pdf_cmdline (string split ' ' $pdf_cmdline)
-        $pdf_cmdline
+        $pdf_cmdline &
     case '*'
         echo -e $usagestring ; exit 1
 end

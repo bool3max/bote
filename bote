@@ -42,10 +42,10 @@ set -q _flag_L && set logfile $_flag_L
 
 # function definitions
 
-function minargs -a min -V argv
+function minargs
     # call this to ensure that the script is called with the appropriate number of arguments AFTER the flags have already been parsed and removed from the
     # main $argv. The reason I'm not using `argprase`'s -N is because it's not the same for each operation that the user can execute
-    test (count $argv) -lt $min && echo -e $usagestring && exit 1
+    test (math (count $argv) - 1) -lt $argv[1] && echo -e $usagestring && exit 1
 end
 
 function create_category
@@ -115,7 +115,7 @@ function md2pdf
     # argv[2] - the note name
     # argv[3] - the per-operation stylesheet to use (optional)
     not test -f "$rootdir/$argv[1]/$argv[2].md" && return 1 # quit if the note doesn't exist
-    pandoc -f markdown -t html5 "$rootdir/$argv[1]/$argv[2].md" --pdf-engine wkhtmltopdf --css (set -q argv[3] && echo -n $argv[3] || echo -n $default_stylesheet) -o "$rootdir/$argv[1]/pdf/$argv[2].pdf" 1>>$logfile 2>>&1
+    pandoc -f markdown -t html5 "$rootdir/$argv[1]/$argv[2].md" --pdf-engine wkhtmltopdf --css (set -q argv[3] && echo -n $argv[3] || echo -n $default_stylesheet) -o "$rootdir/$argv[1]/pdf/$argv[2].pdf" 1>>$logfile 2>>$logfile
 end
 
 function remove_note
@@ -177,27 +177,27 @@ end
 # runtime starts here
 
 not test -d $rootdir/pdf && mkdir -p $rootdir/pdf # create the root directory if it doesn't exist
-minargs 1 # immediately quit if less than 1 argument was provided (that usually being the 'operation to perform')
+minargs 1 $argv # immediately quit if less than 1 argument was provided (that usually being the 'operation to perform')
 
 switch $argv[1] # the operation to perform
     case create-category C
-        minargs 2
+        minargs 2 $argv
         create_category $argv[2]
     case remove-category D
-        minargs 2
+        minargs 2 $argv
         remove_category $argv[2]
     case move-category M
-        minargs 3
+        minargs 3 $argv
         move_category $argv[2] $argv[3]
     case create c
-        minargs 2
+        minargs 2 $argv
         test (count $argv) -ge 3 && create_note $argv[2] $argv[3] $_flag_css || create_note '/' $argv[2] $_flag_css
         test $status = 2 && echo -e "\e[1mA category of the same name already exists!\e[0m" ; exit 1
     case remove d
-        minargs 2
+        minargs 2 $argv
         test (count $argv) -ge 3 && remove_note $argv[2] $argv[3] || remove_note '/' $argv[2]
     case move m
-        minargs 3
+        minargs 3 $argv
         test (count $argv) -ge 4 && move_note $argv[2] $argv[3] $argv[4] || move_note '/' $argv[2] $argv[3]
     case sanitize s
         # no minargs since it takes no arguments
@@ -216,7 +216,7 @@ switch $argv[1] # the operation to perform
     case restore r
         localrestore $argv[2]
     case edit e 
-        minargs 2
+        minargs 2 $argv
 
         # establish paths to both the .md and the .pdf file
         if test (count $argv) -ge 3
@@ -246,7 +246,7 @@ switch $argv[1] # the operation to perform
         set pid_sub (jobs -lp)
         $editor_cmdline; kill -15 $pid_pdf $pid_sub 2>/dev/null; touch $mdpath # touch is a temporary hack to force the inotifywait child process to exit
     case view v
-        minargs 2
+        minargs 2 $argv
         if test (count $argv) -ge 3
             set pdfpath "$rootdir/$argv[2]/pdf/$argv[3].pdf" 
         else
